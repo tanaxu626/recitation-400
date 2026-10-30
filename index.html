@@ -1269,6 +1269,141 @@ html, body {
   line-height: 1.5;
 }
 
+
+/* 牛津/韦氏高阶双解弹层增强样式 */
+.word-title-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.word-inflection-tag {
+  font-size: 12px;
+  color: var(--accent-terracotta);
+  font-weight: 600;
+}
+.word-ee-box {
+  background: rgba(166, 99, 71, 0.08);
+  border-left: 3.5px solid var(--accent-terracotta);
+  border-radius: 0 10px 10px 0;
+  padding: 10px 13px;
+  margin-bottom: 10px;
+}
+.word-ee-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent-terracotta);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+.word-ee-text {
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--text-primary);
+  font-style: italic;
+  font-family: Georgia, -apple-system, serif;
+}
+.word-dict-example-box {
+  background: rgba(0, 0, 0, 0.025);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 11px 13px;
+  margin-bottom: 10px;
+}
+.word-dict-example-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.word-dict-example-tag {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--accent-terracotta);
+}
+.word-dict-example-audio-btn {
+  background: rgba(166, 99, 71, 0.1);
+  border: none;
+  color: var(--accent-terracotta);
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.word-dict-example-audio-btn:hover {
+  background: var(--accent-terracotta);
+  color: #fff;
+}
+.word-dict-example-en {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.word-dict-example-zh {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+.word-collocation-box {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  background: rgba(166, 99, 71, 0.05);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.word-collocation-tag {
+  font-weight: 700;
+  color: var(--accent-terracotta);
+}
+.word-source-accordion {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding-top: 4px;
+  border-top: 1px dashed var(--border-color);
+  margin-top: 4px;
+}
+.word-source-tag {
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+}
+.vocab-card-ee {
+  background: rgba(166, 99, 71, 0.06);
+  border-left: 3px solid var(--accent-terracotta);
+  padding: 6px 10px;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  font-style: italic;
+  font-family: Georgia, serif;
+  margin: 6px 0;
+  color: var(--text-primary);
+}
+.vocab-card-dict-ex {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 7px 10px;
+  margin: 6px 0;
+}
+.vocab-card-dict-ex-en {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.vocab-card-dict-ex-zh {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
 </style>
 </head>
 <body>
@@ -12544,26 +12679,54 @@ html, body {
 </nav>
 </div><!-- /.app-shell -->
 
-<!-- 单词详情释义浮层 (Word Popover) -->
+<!-- 单词详情释义浮层 (Oxford / Merriam-Webster 高阶双解版) -->
 <div class="word-modal" id="word-modal" onclick="closeWordModal(event)">
   <div class="word-modal-card" onclick="event.stopPropagation()">
     <div class="word-card-header">
-      <div class="word-title-row">
-        <div class="word-headword" id="modalWordHead">Word</div>
-        <div class="word-badges" id="modalWordBadges"></div>
+      <div class="word-title-col">
+        <div class="word-title-row">
+          <div class="word-headword" id="modalWordHead">Word</div>
+          <div class="word-badges" id="modalWordBadges"></div>
+        </div>
+        <div class="word-inflection-tag" id="modalWordInflection"></div>
       </div>
       <button class="word-modal-close" onclick="closeWordModal(event)">✕</button>
     </div>
     <div class="word-card-body">
+      <!-- 韦氏/牛津英英释义 -->
+      <div class="word-ee-box" id="modalWordEeBox">
+        <div class="word-ee-label" id="modalWordEeLabel">📖 韦氏英英释义 (Merriam-Webster)</div>
+        <div class="word-ee-text" id="modalWordEeText">"..."</div>
+      </div>
+      
+      <!-- 简明精准中文 -->
       <div class="word-meaning-box" id="modalWordMeaning">中文释义</div>
-      <div class="word-context-box">
-        <div class="word-context-tag" id="modalWordLesson">第 01 课 · 出处例句</div>
-        <div class="word-context-sentence" id="modalWordSentence">原句展示</div>
+      
+      <!-- 词典典范例句 (独立真实语境) -->
+      <div class="word-dict-example-box" id="modalWordDictExampleBox">
+        <div class="word-dict-example-header">
+          <span class="word-dict-example-tag">💬 词典经典例句</span>
+          <button class="word-dict-example-audio-btn" onclick="speakCurrentModalExample(event)">🔊 听例句发音</button>
+        </div>
+        <div class="word-dict-example-en" id="modalWordDictExampleEn"></div>
+        <div class="word-dict-example-zh" id="modalWordDictExampleZh"></div>
+      </div>
+      
+      <!-- 经典搭配 (如有) -->
+      <div class="word-collocation-box" id="modalWordCollocationBox" style="display:none;">
+        <span class="word-collocation-tag">📌 常用搭配:</span>
+        <span class="word-collocation-text" id="modalWordCollocationText"></span>
+      </div>
+      
+      <!-- 课文出处对照 -->
+      <div class="word-source-accordion" id="modalWordSourceAccordion">
+        <div class="word-source-tag" id="modalWordLesson">第 01 课 · 出处句</div>
+        <div class="word-context-sentence" id="modalWordSentence"></div>
       </div>
     </div>
     <div class="word-card-footer">
       <button class="word-audio-btn" id="modalWordAudioBtn" onclick="speakCurrentModalWord()">
-        🔊 朗读发音
+        🔊 朗读单词
       </button>
       <button class="word-save-btn" id="modalWordSaveBtn" onclick="toggleCurrentWordSave()">
         ➕ 收入生词本
@@ -13115,6 +13278,7 @@ function refreshWordsInActiveCard() {
 }
 
 // 点击单词弹出释义卡片
+// 点击单词弹出释义卡片 (Oxford / Merriam-Webster 高阶双解版)
 function onWordClick(spanEl) {
   var word = spanEl.getAttribute('data-word');
   var card = spanEl.closest('.lesson-card');
@@ -13134,23 +13298,33 @@ function onWordClick(spanEl) {
   // 从本地词库中检索
   var dictBundle = window.__HANDBOOK_DICT__ || { en: {}, de: {} };
   var langDict = dictBundle[currentLang] || {};
-  var entry = langDict[word] || langDict[word.toLowerCase()] || null;
+  var entry = langDict[word] || langDict[word.toLowerCase()] || langDict[word.toUpperCase()] || null;
 
   var lemma = entry ? entry.lemma : word;
+  var inflection = entry ? (entry.inflection || '') : '';
   var gender = entry ? entry.gender : '';
   var pos = entry ? entry.pos : '';
-  var phonetic = entry ? entry.phonetic : '';
+  var ipa = entry ? (entry.ipa_uk || entry.ipa_us || entry.phonetic || '') : '';
+  var ee_def = entry ? (entry.ee_def || entry.de_def || '') : '';
   var meaning = entry ? entry.meaning : '点击【➕ 收入生词本】可加入您的专属生词库并在课后集中复习。';
+  var example_en = entry ? (entry.example_en || entry.example_de || '') : '';
+  var example_zh = entry ? (entry.example_zh || '') : '';
+  var collocation = entry ? (entry.collocation || '') : '';
   var sentence = (entry && entry.sentence) ? entry.sentence : contextText;
 
   currentModalWordData = {
     key: currentLang + '_' + word.toLowerCase(),
     word: word,
     lemma: lemma,
+    inflection: inflection,
     gender: gender,
     pos: pos,
-    phonetic: phonetic,
+    ipa: ipa,
+    ee_def: ee_def,
     meaning: meaning,
+    example_en: example_en,
+    example_zh: example_zh,
+    collocation: collocation,
     sentence: sentence,
     lesson: lessonNum,
     title: lessonTitle,
@@ -13159,15 +13333,23 @@ function onWordClick(spanEl) {
     learned: false
   };
 
-  // 渲染弹层内容
+  // 1. 词头与原形展示
   document.getElementById('modalWordHead').textContent = lemma || word;
+  var inflEl = document.getElementById('modalWordInflection');
+  if (inflection && inflection !== '原形' && inflection !== '核心短语') {
+    inflEl.textContent = '形式: ' + word + ' (' + inflection + ')';
+    inflEl.style.display = 'block';
+  } else {
+    inflEl.style.display = 'none';
+  }
   
+  // 2. 徽章（冠词、词性、音标）
   var badgesEl = document.getElementById('modalWordBadges');
   badgesEl.innerHTML = '';
   if (gender) {
     var gSpan = document.createElement('span');
     gSpan.className = 'gender-pill ' + (gender === 'der' ? 'm' : (gender === 'die' ? 'f' : 'n'));
-    gSpan.textContent = gender + ' ' + (gender === 'der' ? '阳性' : (gender === 'die' ? '阴性' : '中性'));
+    gSpan.textContent = gender;
     badgesEl.appendChild(gSpan);
   }
   if (pos) {
@@ -13176,20 +13358,55 @@ function onWordClick(spanEl) {
     pSpan.textContent = pos;
     badgesEl.appendChild(pSpan);
   }
-  if (phonetic) {
+  if (ipa) {
     var phSpan = document.createElement('span');
     phSpan.className = 'phonetic-pill';
-    phSpan.textContent = '/' + phonetic + '/';
+    phSpan.textContent = ipa.startsWith('/') ? ipa : ('/' + ipa + '/');
     badgesEl.appendChild(phSpan);
   }
 
+  // 3. 韦氏英英释义
+  var eeBox = document.getElementById('modalWordEeBox');
+  var eeText = document.getElementById('modalWordEeText');
+  var eeLabel = document.getElementById('modalWordEeLabel');
+  if (ee_def) {
+    eeLabel.textContent = currentLang === 'de' ? '📖 德语释义 (Duden)' : '📖 韦氏英英释义 (Merriam-Webster)';
+    eeText.textContent = '"' + ee_def + '"';
+    eeBox.style.display = 'block';
+  } else {
+    eeBox.style.display = 'none';
+  }
+
+  // 4. 精准中文
   document.getElementById('modalWordMeaning').textContent = meaning;
-  document.getElementById('modalWordLesson').textContent = '第 ' + lessonNum + ' 课 · ' + lessonTitle;
-  
-  // 原句高亮
+
+  // 5. 词典独立例句
+  var dictExBox = document.getElementById('modalWordDictExampleBox');
+  var dictExEn = document.getElementById('modalWordDictExampleEn');
+  var dictExZh = document.getElementById('modalWordDictExampleZh');
+  if (example_en) {
+    dictExEn.textContent = example_en;
+    dictExZh.textContent = example_zh;
+    dictExBox.style.display = 'block';
+  } else {
+    dictExBox.style.display = 'none';
+  }
+
+  // 6. 搭配
+  var collBox = document.getElementById('modalWordCollocationBox');
+  var collText = document.getElementById('modalWordCollocationText');
+  if (collocation) {
+    collText.textContent = collocation;
+    collBox.style.display = 'flex';
+  } else {
+    collBox.style.display = 'none';
+  }
+
+  // 7. 课文出处句
+  document.getElementById('modalWordLesson').textContent = '第 ' + lessonNum + ' 课 · ' + lessonTitle + '（课文原句对照）';
   var sentEl = document.getElementById('modalWordSentence');
   if (sentence) {
-    var safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var safeWord = word.replace(/[.*+?^()|[\]\\]/g, '\\$&');
     var re = new RegExp('(' + safeWord + ')', 'gi');
     sentEl.innerHTML = sentence.replace(re, '<mark>$1</mark>');
   } else {
@@ -13208,6 +13425,21 @@ function onWordClick(spanEl) {
   }
 
   document.getElementById('word-modal').classList.add('show');
+}
+
+// 朗读当前弹层中的词典例句
+function speakCurrentModalExample(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  if (!currentModalWordData || !currentModalWordData.example_en) return;
+  var text = currentModalWordData.example_en;
+  var langCode = currentModalWordData.lang === 'de' ? 'de-DE' : 'en-US';
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = langCode;
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
 }
 
 function closeWordModal(e) {
@@ -13336,22 +13568,41 @@ function renderVocabCards() {
       actionBtnHtml = '<button class="btn-card-toggle relearn" onclick="toggleCardLearned(\'' + item.key + '\', false)">↩ 移回生词本</button>';
     }
 
+    var eeHtml = item.ee_def ? '<div class="vocab-card-ee">"' + item.ee_def + '"</div>' : '';
+    var dictExHtml = item.example_en ? (
+      '<div class="vocab-card-dict-ex">' +
+        '<div class="vocab-card-dict-ex-en">' + item.example_en + '</div>' +
+        (item.example_zh ? '<div class="vocab-card-dict-ex-zh">' + item.example_zh + '</div>' : '') +
+      '</div>'
+    ) : '';
+
+    var inflTxt = (item.inflection && item.inflection !== '原形') ? '<span class="word-inflection-tag" style="margin-left:6px;">(' + item.inflection + ')</span>' : '';
+
+    var eeHtml = item.ee_def ? '<div class="vocab-card-ee">"' + item.ee_def + '"</div>' : '';
+    var dictExHtml = item.example_en ? (
+      '<div class="vocab-card-dict-ex">' +
+        '<div class="vocab-card-dict-ex-en">' + item.example_en + '</div>' +
+        (item.example_zh ? '<div class="vocab-card-dict-ex-zh">' + item.example_zh + '</div>' : '') +
+      '</div>'
+    ) : '';
+    var inflTxt = (item.inflection && item.inflection !== '原形') ? '<span class="word-inflection-tag" style="margin-left:6px;">(' + item.inflection + ')</span>' : '';
+
     card.innerHTML = 
       '<div class="vocab-card-top">' +
         '<div class="vocab-card-word-group">' +
           '<div class="vocab-card-word">' + (item.lemma || item.word) + '</div>' +
-          genderBadge + posTxt + phoneticTxt +
-          '<button class="vocab-card-speaker" onclick="speakVocabItem(\'' + item.word + '\', \'' + item.lang + '\')">🔊</button>' +
+          inflTxt + genderBadge + posTxt + phoneticTxt +
+          '<button class="vocab-card-speaker" onclick="speakVocabItem(\'' + (item.lemma || item.word) + '\', \'' + item.lang + '\')">🔊</button>' +
         '</div>' +
         '<button class="btn-card-del" title="彻底删除" onclick="deleteVocabItem(\'' + item.key + '\')">✕</button>' +
       '</div>' +
+      eeHtml +
       '<div class="vocab-card-meaning">' + item.meaning + '</div>' +
-      '<div class="vocab-card-sentence">' + hlSentence + '</div>' +
+      dictExHtml +
       '<div class="vocab-card-actions">' +
         '<span class="vocab-card-lesson-tag">第 ' + item.lesson + ' 课 · ' + item.title + '</span>' +
         actionBtnHtml +
       '</div>';
-
     container.appendChild(card);
   });
 }
