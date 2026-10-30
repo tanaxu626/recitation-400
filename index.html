@@ -806,6 +806,469 @@ html, body {
   opacity: 0.9;
 }
 
+
+/* =================== 点词查词与生词本专属样式 =================== */
+.lookup-word {
+  display: inline;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 2px;
+  margin: -1px -2px;
+  transition: background-color 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: rgba(166, 99, 71, 0.25);
+}
+.lookup-word:hover, .lookup-word:active {
+  background-color: rgba(166, 99, 71, 0.14);
+  color: var(--accent-terracotta);
+}
+.lookup-word.in-notebook {
+  border-bottom: 2px dotted var(--accent-terracotta);
+  font-weight: 500;
+}
+.header-tool-btn.vocab-tool-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--accent-terracotta);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.vocab-badge-count {
+  display: inline-block;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 9px;
+  background: var(--accent-terracotta);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 0 5px;
+  text-align: center;
+}
+.vocab-badge-count.zero {
+  display: none;
+}
+
+/* 单词详情弹层 (Word Popover) */
+.word-modal {
+  display: none !important;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2200;
+  justify-content: center;
+  align-items: flex-end;
+}
+.word-modal.show {
+  display: flex !important;
+}
+.word-modal-card {
+  width: 100%;
+  max-width: 580px;
+  background: var(--bg-card);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.3);
+  padding: 24px 22px calc(24px + env(safe-area-inset-bottom)) 22px;
+  animation: slideUpWord 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid var(--border-color);
+}
+@keyframes slideUpWord {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.word-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+.word-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.word-headword {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--accent-terracotta);
+  line-height: 1.2;
+}
+.word-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.gender-pill {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+.gender-pill.m { background: #1976D2; } /* der 阳性蓝 */
+.gender-pill.f { background: #C2185B; } /* die 阴性红 */
+.gender-pill.n { background: #2E7D32; } /* das 中性绿 */
+.pos-pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--bg-tag);
+  color: var(--text-secondary);
+}
+.phonetic-pill {
+  font-size: 13px;
+  font-family: ui-monospace, Menlo, Monaco, monospace;
+  color: var(--text-secondary);
+}
+.word-modal-close {
+  background: var(--bg-tag);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.word-meaning-box {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+  background: var(--bg-page);
+  padding: 12px 16px;
+  border-radius: 14px;
+  border-left: 4px solid var(--accent-terracotta);
+}
+.word-context-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-page);
+  padding: 12px 16px;
+  border-radius: 14px;
+}
+.word-context-tag {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-terracotta);
+}
+.word-context-sentence {
+  font-size: 15px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+.word-context-sentence mark {
+  background: rgba(166, 99, 71, 0.2);
+  color: var(--accent-terracotta);
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 4px;
+}
+.word-card-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+.word-audio-btn {
+  flex: 0.9;
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.word-save-btn {
+  flex: 1.6;
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent-terracotta);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.1s, background-color 0.2s;
+}
+.word-save-btn:active {
+  transform: scale(0.97);
+}
+.word-save-btn.saved {
+  background: #2E7D32;
+}
+
+/* ================= 专属生词本大抽屉 ================= */
+.vocab-modal {
+  display: none !important;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2200;
+  justify-content: center;
+  align-items: flex-end;
+}
+.vocab-modal.show {
+  display: flex !important;
+}
+.vocab-drawer {
+  width: 100%;
+  max-width: 680px;
+  height: 88dvh;
+  max-height: 850px;
+  background: var(--bg-card);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  animation: slideUpVocab 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+@keyframes slideUpVocab {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.vocab-drawer-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.vocab-drawer-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--accent-terracotta);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.vocab-drawer-subtitle {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+.vocab-drawer-close {
+  background: var(--bg-tag);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.vocab-tabs-bar {
+  display: flex;
+  background: var(--bg-page);
+  padding: 8px 16px;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.vocab-tab-btn {
+  flex: 1;
+  text-align: center;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.vocab-tab-btn.active {
+  background: var(--bg-card);
+  color: var(--accent-terracotta);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.vocab-filter-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+.vocab-filter-pill {
+  padding: 5px 12px;
+  border-radius: 16px;
+  background: var(--bg-tag);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.vocab-filter-pill.active {
+  background: var(--accent-terracotta);
+  color: #fff;
+}
+.vocab-export-btn {
+  margin-left: auto;
+  padding: 5px 12px;
+  border-radius: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.vocab-cards-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.vocab-card-item {
+  background: var(--bg-page);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+.vocab-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.vocab-card-word-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vocab-card-word {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent-terracotta);
+}
+.vocab-card-speaker {
+  background: none;
+  border: none;
+  font-size: 17px;
+  cursor: pointer;
+  padding: 2px 6px;
+  color: var(--text-secondary);
+}
+.vocab-card-meaning {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+.vocab-card-sentence {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  border-left: 3px solid var(--border-color);
+  padding-left: 10px;
+  margin-top: 2px;
+}
+.vocab-card-sentence mark {
+  background: rgba(166, 99, 71, 0.2);
+  color: var(--accent-terracotta);
+  font-weight: 700;
+  padding: 0 4px;
+  border-radius: 4px;
+}
+.vocab-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+.vocab-card-lesson-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.btn-card-toggle {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-card-toggle.learn {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #C8E6C9;
+}
+.btn-card-toggle.relearn {
+  background: #FFF3E0;
+  color: #E65100;
+  border: 1px solid #FFE0B2;
+}
+.btn-card-del {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.vocab-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+.vocab-empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+.vocab-empty-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.vocab-empty-subtext {
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
 </style>
 </head>
 <body>
@@ -822,6 +1285,9 @@ html, body {
       <button class="header-lang-pill" id="headerPillDe" onclick="switchLanguage('de')">🇩🇪 德语</button>
     </div>
     <div class="header-actions">
+            <button class="header-tool-btn vocab-tool-btn" id="headerVocabBtn" onclick="openVocabNotebook(event)">
+        📚 生词本 <span class="vocab-badge-count zero" id="vocabBadgeCount">0</span>
+      </button>
       <button class="header-tool-btn" onclick="openTocModal(event)">📑 目录</button>
       <button class="header-tool-btn" onclick="toggleSettingsModal(event)">⚙️ 设置</button>
     </div>
@@ -12078,6 +12544,72 @@ html, body {
 </nav>
 </div><!-- /.app-shell -->
 
+<!-- 单词详情释义浮层 (Word Popover) -->
+<div class="word-modal" id="word-modal" onclick="closeWordModal(event)">
+  <div class="word-modal-card" onclick="event.stopPropagation()">
+    <div class="word-card-header">
+      <div class="word-title-row">
+        <div class="word-headword" id="modalWordHead">Word</div>
+        <div class="word-badges" id="modalWordBadges"></div>
+      </div>
+      <button class="word-modal-close" onclick="closeWordModal(event)">✕</button>
+    </div>
+    <div class="word-card-body">
+      <div class="word-meaning-box" id="modalWordMeaning">中文释义</div>
+      <div class="word-context-box">
+        <div class="word-context-tag" id="modalWordLesson">第 01 课 · 出处例句</div>
+        <div class="word-context-sentence" id="modalWordSentence">原句展示</div>
+      </div>
+    </div>
+    <div class="word-card-footer">
+      <button class="word-audio-btn" id="modalWordAudioBtn" onclick="speakCurrentModalWord()">
+        🔊 朗读发音
+      </button>
+      <button class="word-save-btn" id="modalWordSaveBtn" onclick="toggleCurrentWordSave()">
+        ➕ 收入生词本
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 专属生词本抽屉 (Vocabulary Notebook Modal) -->
+<div class="vocab-modal" id="vocab-modal" onclick="closeVocabNotebook(event)">
+  <div class="vocab-drawer" onclick="event.stopPropagation()">
+    <div class="vocab-drawer-header">
+      <div class="vocab-drawer-title">
+        📚 专属生词本
+        <span class="vocab-drawer-subtitle">（纯离线永久保存，随时移出归档）</span>
+      </div>
+      <button class="vocab-drawer-close" onclick="closeVocabNotebook(event)">✕</button>
+    </div>
+    
+    <!-- 状态切换栏 -->
+    <div class="vocab-tabs-bar">
+      <div class="vocab-tab-btn active" id="tabUnmastered" onclick="switchVocabTab('unmastered')">
+        🎯 待掌握生词 (<span id="countUnmastered">0</span>)
+      </div>
+      <div class="vocab-tab-btn" id="tabMastered" onclick="switchVocabTab('mastered')">
+        🏆 已学会归档 (<span id="countMastered">0</span>)
+      </div>
+    </div>
+    
+    <!-- 语种过滤与工具栏 -->
+    <div class="vocab-filter-row">
+      <div class="vocab-filter-pill active" id="filterAll" onclick="setVocabFilter('all')">全部</div>
+      <div class="vocab-filter-pill" id="filterEn" onclick="setVocabFilter('en')">🇬🇧 英语</div>
+      <div class="vocab-filter-pill" id="filterDe" onclick="setVocabFilter('de')">🇩🇪 德语</div>
+      <button class="vocab-export-btn" onclick="exportVocabToClipboard()">📋 导出单词表</button>
+    </div>
+    
+    <!-- 单词卡片列表 -->
+    <div class="vocab-cards-list" id="vocabCardsContainer">
+      <!-- 动态注入 -->
+    </div>
+  </div>
+</div>
+
+
+<script src="handbook_dict.js"></script>
 <script>
 var currentPlayingAudio = null;
 var currentSpeechRate = 1.0;
@@ -12469,6 +13001,430 @@ function resetFontSize() {
   document.documentElement.style.setProperty('--trans-font-size', '16px');
   try { localStorage.setItem('reader_pref_font', 19); } catch(e) {}
 }
+
+
+// =====================================================================
+// 📖 400句型 点词释义与专属生词本系统 (100% 纯离线持久化)
+// =====================================================================
+var currentModalWordData = null;
+var activeVocabTab = 'unmastered'; // 'unmastered' | 'mastered'
+var activeVocabFilter = 'all';    // 'all' | 'en' | 'de'
+var NOTEBOOK_STORAGE_KEY = 'recitation_vocab_notebook_v1';
+
+// 获取生词本数据
+function getVocabNotebook() {
+  try {
+    var raw = localStorage.getItem(NOTEBOOK_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) {
+    return {};
+  }
+}
+
+// 保存生词本数据
+function saveVocabNotebook(book) {
+  try {
+    localStorage.setItem(NOTEBOOK_STORAGE_KEY, JSON.stringify(book));
+  } catch(e) {}
+  updateVocabBadge();
+  refreshWordsInActiveCard();
+}
+
+// 更新顶栏角标
+function updateVocabBadge() {
+  var book = getVocabNotebook();
+  var count = 0;
+  for (var k in book) {
+    if (!book[k].learned) count++;
+  }
+  var badge = document.getElementById('vocabBadgeCount');
+  if (badge) {
+    badge.textContent = count;
+    if (count > 0) badge.classList.remove('zero');
+    else badge.classList.add('zero');
+  }
+}
+
+// 建立段落单词的微交互 (保留 <span class='target-pattern'> 结构)
+function makeParagraphWordsInteractive(para, lang) {
+  if (para.getAttribute('data-words-bound')) return;
+  para.setAttribute('data-words-bound', 'true');
+
+  var walker = document.createTreeWalker(para, NodeFilter.SHOW_TEXT, null, false);
+  var textNodes = [];
+  var node;
+  while ((node = walker.nextNode())) {
+    if (node.parentElement && node.parentElement.classList.contains('lookup-word')) continue;
+    textNodes.push(node);
+  }
+
+  var regex = lang === 'en'
+    ? /([a-zA-Z]+(?:'[a-zA-Z]+)?)|([^a-zA-Z]+)/g
+    : /([a-zA-ZäöüÄÖÜß]+(?:-[a-zA-ZäöüÄÖÜß]+)?)|([^a-zA-ZäöüÄÖÜß]+)/g;
+
+  var book = getVocabNotebook();
+
+  textNodes.forEach(function(textNode) {
+    var text = textNode.nodeValue;
+    var frag = document.createDocumentFragment();
+    var match;
+    var hasWord = false;
+    while ((match = regex.exec(text)) !== null) {
+      if (match[1]) {
+        hasWord = true;
+        var span = document.createElement('span');
+        span.className = 'lookup-word';
+        var wordText = match[1];
+        span.setAttribute('data-word', wordText);
+        span.textContent = wordText;
+
+        // 检查是否已在待掌握生词本中
+        var key = lang + '_' + wordText.toLowerCase();
+        if (book[key] && !book[key].learned) {
+          span.classList.add('in-notebook');
+        }
+
+        span.onclick = function(e) {
+          e.stopPropagation();
+          onWordClick(this);
+        };
+        frag.appendChild(span);
+      } else if (match[2]) {
+        frag.appendChild(document.createTextNode(match[2]));
+      }
+    }
+    if (hasWord && textNode.parentNode) {
+      textNode.parentNode.replaceChild(frag, textNode);
+    }
+  });
+}
+
+// 刷新当前课程卡片中单词的高亮下划线状态
+function refreshWordsInActiveCard() {
+  var book = getVocabNotebook();
+  var words = document.querySelectorAll('.lookup-word');
+  words.forEach(function(span) {
+    var w = span.getAttribute('data-word');
+    var key = currentLang + '_' + w.toLowerCase();
+    if (book[key] && !book[key].learned) {
+      span.classList.add('in-notebook');
+    } else {
+      span.classList.remove('in-notebook');
+    }
+  });
+}
+
+// 点击单词弹出释义卡片
+function onWordClick(spanEl) {
+  var word = spanEl.getAttribute('data-word');
+  var card = spanEl.closest('.lesson-card');
+  var lessonNum = '01';
+  var lessonTitle = '';
+  if (card) {
+    var tag = card.querySelector('.hero-tag');
+    if (tag) lessonNum = tag.textContent.replace(/[^0-9]/g, '');
+    var h1 = card.querySelector('.hero-title');
+    if (h1) lessonTitle = h1.textContent.trim();
+  }
+
+  // 获取所在段落或整句
+  var p = spanEl.closest('.story-para');
+  var contextText = p ? p.textContent.trim() : '';
+
+  // 从本地词库中检索
+  var dictBundle = window.__HANDBOOK_DICT__ || { en: {}, de: {} };
+  var langDict = dictBundle[currentLang] || {};
+  var entry = langDict[word] || langDict[word.toLowerCase()] || null;
+
+  var lemma = entry ? entry.lemma : word;
+  var gender = entry ? entry.gender : '';
+  var pos = entry ? entry.pos : '';
+  var phonetic = entry ? entry.phonetic : '';
+  var meaning = entry ? entry.meaning : '点击【➕ 收入生词本】可加入您的专属生词库并在课后集中复习。';
+  var sentence = (entry && entry.sentence) ? entry.sentence : contextText;
+
+  currentModalWordData = {
+    key: currentLang + '_' + word.toLowerCase(),
+    word: word,
+    lemma: lemma,
+    gender: gender,
+    pos: pos,
+    phonetic: phonetic,
+    meaning: meaning,
+    sentence: sentence,
+    lesson: lessonNum,
+    title: lessonTitle,
+    lang: currentLang,
+    addedAt: Date.now(),
+    learned: false
+  };
+
+  // 渲染弹层内容
+  document.getElementById('modalWordHead').textContent = lemma || word;
+  
+  var badgesEl = document.getElementById('modalWordBadges');
+  badgesEl.innerHTML = '';
+  if (gender) {
+    var gSpan = document.createElement('span');
+    gSpan.className = 'gender-pill ' + (gender === 'der' ? 'm' : (gender === 'die' ? 'f' : 'n'));
+    gSpan.textContent = gender + ' ' + (gender === 'der' ? '阳性' : (gender === 'die' ? '阴性' : '中性'));
+    badgesEl.appendChild(gSpan);
+  }
+  if (pos) {
+    var pSpan = document.createElement('span');
+    pSpan.className = 'pos-pill';
+    pSpan.textContent = pos;
+    badgesEl.appendChild(pSpan);
+  }
+  if (phonetic) {
+    var phSpan = document.createElement('span');
+    phSpan.className = 'phonetic-pill';
+    phSpan.textContent = '/' + phonetic + '/';
+    badgesEl.appendChild(phSpan);
+  }
+
+  document.getElementById('modalWordMeaning').textContent = meaning;
+  document.getElementById('modalWordLesson').textContent = '第 ' + lessonNum + ' 课 · ' + lessonTitle;
+  
+  // 原句高亮
+  var sentEl = document.getElementById('modalWordSentence');
+  if (sentence) {
+    var safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var re = new RegExp('(' + safeWord + ')', 'gi');
+    sentEl.innerHTML = sentence.replace(re, '<mark>$1</mark>');
+  } else {
+    sentEl.textContent = '暂无原句例句';
+  }
+
+  // 检查是否已存入
+  var book = getVocabNotebook();
+  var saveBtn = document.getElementById('modalWordSaveBtn');
+  if (book[currentModalWordData.key]) {
+    saveBtn.classList.add('saved');
+    saveBtn.innerHTML = '✓ 已在生词本 (点击移出)';
+  } else {
+    saveBtn.classList.remove('saved');
+    saveBtn.innerHTML = '➕ 收入生词本';
+  }
+
+  document.getElementById('word-modal').classList.add('show');
+}
+
+function closeWordModal(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  var m = document.getElementById('word-modal');
+  if (m) m.classList.remove('show');
+}
+
+// 朗读当前弹层单词 (原生 Web Speech API)
+function speakCurrentModalWord() {
+  if (!currentModalWordData) return;
+  var text = currentModalWordData.word;
+  var langCode = currentModalWordData.lang === 'de' ? 'de-DE' : 'en-US';
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = langCode;
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+// 切换保存到生词本
+function toggleCurrentWordSave() {
+  if (!currentModalWordData) return;
+  var book = getVocabNotebook();
+  var key = currentModalWordData.key;
+  var saveBtn = document.getElementById('modalWordSaveBtn');
+  if (book[key]) {
+    delete book[key];
+    saveBtn.classList.remove('saved');
+    saveBtn.innerHTML = '➕ 收入生词本';
+  } else {
+    book[key] = currentModalWordData;
+    saveBtn.classList.add('saved');
+    saveBtn.innerHTML = '✓ 已在生词本 (点击移出)';
+  }
+  saveVocabNotebook(book);
+}
+
+// ================= 生词本抽屉交互 =================
+function openVocabNotebook(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  renderVocabCards();
+  var m = document.getElementById('vocab-modal');
+  if (m) m.classList.add('show');
+}
+
+function closeVocabNotebook(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  var m = document.getElementById('vocab-modal');
+  if (m) m.classList.remove('show');
+}
+
+function switchVocabTab(tab) {
+  activeVocabTab = tab;
+  document.getElementById('tabUnmastered').classList.toggle('active', tab === 'unmastered');
+  document.getElementById('tabMastered').classList.toggle('active', tab === 'mastered');
+  renderVocabCards();
+}
+
+function setVocabFilter(lang) {
+  activeVocabFilter = lang;
+  document.getElementById('filterAll').classList.toggle('active', lang === 'all');
+  document.getElementById('filterEn').classList.toggle('active', lang === 'en');
+  document.getElementById('filterDe').classList.toggle('active', lang === 'de');
+  renderVocabCards();
+}
+
+// 渲染生词卡片流
+function renderVocabCards() {
+  var book = getVocabNotebook();
+  var unmastered = [];
+  var mastered = [];
+
+  for (var k in book) {
+    var item = book[k];
+    if (activeVocabFilter !== 'all' && item.lang !== activeVocabFilter) continue;
+    if (item.learned) mastered.push(item);
+    else unmastered.push(item);
+  }
+
+  // 更新计数
+  document.getElementById('countUnmastered').textContent = unmastered.length;
+  document.getElementById('countMastered').textContent = mastered.length;
+
+  var container = document.getElementById('vocabCardsContainer');
+  container.innerHTML = '';
+
+  var displayList = activeVocabTab === 'unmastered' ? unmastered : mastered;
+
+  if (displayList.length === 0) {
+    var emptyDiv = document.createElement('div');
+    emptyDiv.className = 'vocab-empty-state';
+    if (activeVocabTab === 'unmastered') {
+      emptyDiv.innerHTML = '<div class="vocab-empty-icon">📖</div><div class="vocab-empty-text">生词本空空如也</div><div class="vocab-empty-subtext">在正文故事中点击任意不认识的单词，<br>轻点【➕ 收入生词本】即可随时在此温习！</div>';
+    } else {
+      emptyDiv.innerHTML = '<div class="vocab-empty-icon">🏅</div><div class="vocab-empty-text">尚无已掌握归档</div><div class="vocab-empty-subtext">在待掌握生词中轻点【✓ 标记已学会】，<br>熟记的单词将移入此处永久归档！</div>';
+    }
+    container.appendChild(emptyDiv);
+    return;
+  }
+
+  // 按添加时间倒序排列
+  displayList.sort(function(a, b) { return (b.addedAt || 0) - (a.addedAt || 0); });
+
+  displayList.forEach(function(item) {
+    var card = document.createElement('div');
+    card.className = 'vocab-card-item';
+
+    var safeWord = item.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var re = new RegExp('(' + safeWord + ')', 'gi');
+    var hlSentence = item.sentence ? item.sentence.replace(re, '<mark>$1</mark>') : '暂无原句';
+
+    var genderBadge = '';
+    if (item.gender) {
+      genderBadge = '<span class="gender-pill ' + (item.gender === 'der' ? 'm' : (item.gender === 'die' ? 'f' : 'n')) + '">' + item.gender + '</span>';
+    }
+    var phoneticTxt = item.phonetic ? '<span class="phonetic-pill">/' + item.phonetic + '/</span>' : '';
+    var posTxt = item.pos ? '<span class="pos-pill">' + item.pos + '</span>' : '';
+
+    var actionBtnHtml = '';
+    if (activeVocabTab === 'unmastered') {
+      actionBtnHtml = '<button class="btn-card-toggle learn" onclick="toggleCardLearned(\'' + item.key + '\', true)">✓ 标记已学会</button>';
+    } else {
+      actionBtnHtml = '<button class="btn-card-toggle relearn" onclick="toggleCardLearned(\'' + item.key + '\', false)">↩ 移回生词本</button>';
+    }
+
+    card.innerHTML = 
+      '<div class="vocab-card-top">' +
+        '<div class="vocab-card-word-group">' +
+          '<div class="vocab-card-word">' + (item.lemma || item.word) + '</div>' +
+          genderBadge + posTxt + phoneticTxt +
+          '<button class="vocab-card-speaker" onclick="speakVocabItem(\'' + item.word + '\', \'' + item.lang + '\')">🔊</button>' +
+        '</div>' +
+        '<button class="btn-card-del" title="彻底删除" onclick="deleteVocabItem(\'' + item.key + '\')">✕</button>' +
+      '</div>' +
+      '<div class="vocab-card-meaning">' + item.meaning + '</div>' +
+      '<div class="vocab-card-sentence">' + hlSentence + '</div>' +
+      '<div class="vocab-card-actions">' +
+        '<span class="vocab-card-lesson-tag">第 ' + item.lesson + ' 课 · ' + item.title + '</span>' +
+        actionBtnHtml +
+      '</div>';
+
+    container.appendChild(card);
+  });
+}
+
+function speakVocabItem(word, lang) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(word);
+    u.lang = lang === 'de' ? 'de-DE' : 'en-US';
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+// 标记已掌握 / 移回生词
+function toggleCardLearned(key, isLearned) {
+  var book = getVocabNotebook();
+  if (book[key]) {
+    book[key].learned = isLearned;
+    saveVocabNotebook(book);
+    renderVocabCards();
+  }
+}
+
+// 彻底删除单个词条
+function deleteVocabItem(key) {
+  var book = getVocabNotebook();
+  if (book[key]) {
+    delete book[key];
+    saveVocabNotebook(book);
+    renderVocabCards();
+  }
+}
+
+// 一键复制导出生词列表 (Markdown 格式)
+function exportVocabToClipboard() {
+  var book = getVocabNotebook();
+  var lines = ['# 400句型背诵手册 · 我的生词本导出\n'];
+  var count = 0;
+  for (var k in book) {
+    var item = book[k];
+    count++;
+    var status = item.learned ? '【已掌握】' : '【生词待背】';
+    var genderStr = item.gender ? item.gender + ' ' : '';
+    lines.push(count + '. ' + status + ' **' + genderStr + item.word + '** (' + item.pos + ') - ' + item.meaning);
+    if (item.sentence) {
+      lines.push('   > 例句 (第' + item.lesson + '课): ' + item.sentence);
+    }
+  }
+  if (count === 0) {
+    alert('生词本中暂无单词可导出！');
+    return;
+  }
+  var fullText = lines.join('\n');
+  navigator.clipboard.writeText(fullText).then(function() {
+    alert('✅ 成功导出 ' + count + ' 个单词到剪贴板！\n您可以直接粘贴发送至备忘录、微信或 Anki。');
+  }).catch(function() {
+    prompt('请长按复制导出的单词列表：', fullText);
+  });
+}
+
+// 挂载到切换课目监听中
+var _orig_switchLessonCard = switchLessonCard;
+switchLessonCard = function(targetId) {
+  _orig_switchLessonCard(targetId);
+  var activeCard = document.getElementById(targetId);
+  if (activeCard) {
+    var paras = activeCard.querySelectorAll('.story-para');
+    paras.forEach(function(p) {
+      makeParagraphWordsInteractive(p, currentLang);
+    });
+  }
+};
 
 // 页面载入初始化首课
 document.addEventListener('DOMContentLoaded', function() {
