@@ -1,0 +1,72 @@
+{
+  "name": "400句型 · 新概念情境故事背诵手册",
+  "short_name": "400句型背诵",
+  "description": "400常用句型与新概念情境故事双语背诵手册（英/德母带级原音伴读、大字精排、全离线支持）",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#FDFBF7",
+  "theme_color": "#A66347",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "education",
+    "books",
+    "productivity"
+  ],
+  "shortcuts": [
+    {
+      "name": "英语故事 40 课",
+      "short_name": "英语版",
+      "url": "./index.html#en-lesson-01",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "德语故事 40 课",
+      "short_name": "德语版",
+      "url": "./index.html#de-lesson-01",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
