@@ -12718,11 +12718,7 @@ html, body {
         <span class="word-collocation-text" id="modalWordCollocationText"></span>
       </div>
       
-      <!-- 课文出处对照 -->
-      <div class="word-source-accordion" id="modalWordSourceAccordion">
-        <div class="word-source-tag" id="modalWordLesson">第 01 课 · 出处句</div>
-        <div class="word-context-sentence" id="modalWordSentence"></div>
-      </div>
+
     </div>
     <div class="word-card-footer">
       <button class="word-audio-btn" id="modalWordAudioBtn" onclick="speakCurrentModalWord()">
@@ -13406,16 +13402,7 @@ function onWordClick(spanEl) {
     collBox.style.display = 'none';
   }
 
-  // 7. 课文出处句
-  document.getElementById('modalWordLesson').textContent = '第 ' + lessonNum + ' 课 · ' + lessonTitle + '（课文原句对照）';
-  var sentEl = document.getElementById('modalWordSentence');
-  if (sentence) {
-    var safeWord = word.replace(/[.*+?^()|[\]\\]/g, '\\$&');
-    var re = new RegExp('(' + safeWord + ')', 'gi');
-    sentEl.innerHTML = sentence.replace(re, '<mark>$1</mark>');
-  } else {
-    sentEl.textContent = '暂无原句例句';
-  }
+  // (课文出处句已精简移除，专注于纯粹独立的词典经典例句)
 
   // 检查是否已存入
   var book = getVocabNotebook();

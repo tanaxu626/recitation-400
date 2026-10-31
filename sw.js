@@ -1,4 +1,4 @@
-const CACHE_NAME = 'recitation-app-v2.2.0';
+const CACHE_NAME = 'recitation-app-v2.3.0';
 
 const PRECACHE_ASSETS = [
   './',
