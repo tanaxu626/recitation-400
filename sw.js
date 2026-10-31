@@ -1,8 +1,9 @@
-const CACHE_NAME = 'recitation-app-v1.0.0';
+const CACHE_NAME = 'recitation-app-v2.2.0';
 
 const PRECACHE_ASSETS = [
   './',
   './index.html',
+  './handbook_dict.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',

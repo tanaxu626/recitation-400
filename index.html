@@ -13298,7 +13298,11 @@ function onWordClick(spanEl) {
   // 从本地词库中检索
   var dictBundle = window.__HANDBOOK_DICT__ || { en: {}, de: {} };
   var langDict = dictBundle[currentLang] || {};
-  var entry = langDict[word] || langDict[word.toLowerCase()] || langDict[word.toUpperCase()] || null;
+  var padLesson = ('0' + lessonNum).slice(-2);
+  var entry = langDict[padLesson + '_' + word.toLowerCase()] ||
+              langDict[word] ||
+              langDict[word.toLowerCase()] ||
+              langDict[word.toUpperCase()] || null;
 
   var lemma = entry ? entry.lemma : word;
   var inflection = entry ? (entry.inflection || '') : '';
