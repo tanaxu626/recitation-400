@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
   <!-- PWA & Apple Web App Meta -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest_en.json">
   <meta name="theme-color" content="#A66347">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -12,7 +12,7 @@
   <link rel="icon" type="image/png" href="icons/favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>400句型 · 新概念情境故事背诵手册</title>
+<title>400句型背诵手册 · 英语原声专版</title>
 <style>
 
 :root {
@@ -13082,17 +13082,108 @@ function onAudioEnded(audioId) {
   stopAudio(audioId);
 }
 
-function speakText(text, langCode) {
-  if (!('speechSynthesis' in window)) return;
+
+// ==========================================
+// 🔊 全局多媒体高保真通用音频引擎 (全端 100% 发声)
+// ==========================================
+var globalSpeechAudio = null;
+
+function playUniversalSpeech(text, lang, btnEl) {
+  if (!text) return;
+  var cleanText = text.replace(/<[^>]+>/g, '').replace(/\.{2,}/g, '').replace(/\[\d+\]/g, '').trim();
+  if (!cleanText) return;
+
+  var isWord = cleanText.indexOf(' ') === -1 && cleanText.length <= 30;
+  var audioLang = (lang || (typeof currentLang !== 'undefined' ? currentLang : 'en')).toLowerCase().indexOf('de') !== -1 ? 'de' : 'en';
+
+  if (typeof currentPlayingAudio !== 'undefined' && currentPlayingAudio && !currentPlayingAudio.paused) {
+    stopCurrentPlayingAudio();
+  }
+
+  if (globalSpeechAudio) {
+    try {
+      globalSpeechAudio.pause();
+      globalSpeechAudio.src = '';
+    } catch(e) {}
+    globalSpeechAudio = null;
+  }
+
+  var origHtml = btnEl ? btnEl.innerHTML : '';
+  if (btnEl) {
+    btnEl.classList.add('audio-active-playing');
+    if (btnEl.textContent.indexOf('🔊') !== -1) {
+      btnEl.textContent = btnEl.textContent.replace('🔊', '⏳');
+    }
+  }
+
+  function restoreBtn() {
+    if (btnEl) {
+      btnEl.classList.remove('audio-active-playing');
+      btnEl.innerHTML = origHtml;
+    }
+  }
+
+  var audioUrl = '';
+  if (isWord && audioLang === 'en') {
+    audioUrl = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(cleanText) + '&type=2';
+  } else {
+    audioUrl = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(cleanText) + '&tl=' + audioLang + '&client=tw-ob';
+  }
+
+  var audio = new Audio();
+  audio.crossOrigin = 'anonymous';
+  audio.src = audioUrl;
+  globalSpeechAudio = audio;
+
+  var playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(function() {
+      if (btnEl && btnEl.textContent.indexOf('⏳') !== -1) {
+        btnEl.textContent = btnEl.textContent.replace('⏳', '🔊');
+      }
+    }).catch(function(e) {
+      fallbackSpeechSynthesis(cleanText, audioLang, restoreBtn);
+    });
+  }
+
+  audio.onended = function() {
+    restoreBtn();
+    globalSpeechAudio = null;
+  };
+  audio.onerror = function() {
+    fallbackSpeechSynthesis(cleanText, audioLang, restoreBtn);
+  };
+}
+
+function fallbackSpeechSynthesis(cleanText, audioLang, onComplete) {
+  if (!('speechSynthesis' in window)) {
+    if (onComplete) onComplete();
+    return;
+  }
   try {
     window.speechSynthesis.cancel();
-    if (!text || !text.trim()) return;
-    var utter = new SpeechSynthesisUtterance(text);
-    utter.rate = currentSpeechRate;
-    utter.lang = langCode === 'de' ? 'de-DE' : 'en-US';
-    window.speechSynthesis.speak(utter);
-  } catch(e) {}
+    var u = new SpeechSynthesisUtterance(cleanText);
+    u.lang = audioLang === 'de' ? 'de-DE' : 'en-US';
+    u.rate = (typeof currentSpeechRate !== 'undefined' ? currentSpeechRate : 0.95);
+    u.onend = function() { if (onComplete) onComplete(); };
+    u.onerror = function() { if (onComplete) onComplete(); };
+    window.speechSynthesis.speak(u);
+  } catch(e) {
+    if (onComplete) onComplete();
+  }
 }
+
+function speakText(text, langCode, btnEl) {
+  var targetBtn = btnEl || (window.event ? (window.event.currentTarget || window.event.target) : null);
+  playUniversalSpeech(text, langCode, targetBtn);
+}
+
+
+
+
+
+
+
 
 // 左右轻扫切课手势
 var touchStartX = 0;
@@ -13419,19 +13510,7 @@ function onWordClick(spanEl) {
 }
 
 // 朗读当前弹层中的词典例句
-function speakCurrentModalExample(e) {
-  if (e && e.stopPropagation) e.stopPropagation();
-  if (!currentModalWordData || !currentModalWordData.example_en) return;
-  var text = currentModalWordData.example_en;
-  var langCode = currentModalWordData.lang === 'de' ? 'de-DE' : 'en-US';
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = langCode;
-    u.rate = 0.9;
-    window.speechSynthesis.speak(u);
-  }
-}
+
 
 function closeWordModal(e) {
   if (e && e.stopPropagation) e.stopPropagation();
@@ -13440,18 +13519,7 @@ function closeWordModal(e) {
 }
 
 // 朗读当前弹层单词 (原生 Web Speech API)
-function speakCurrentModalWord() {
-  if (!currentModalWordData) return;
-  var text = currentModalWordData.word;
-  var langCode = currentModalWordData.lang === 'de' ? 'de-DE' : 'en-US';
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = langCode;
-    u.rate = 0.9;
-    window.speechSynthesis.speak(u);
-  }
-}
+
 
 // 切换保存到生词本
 function toggleCurrentWordSave() {
@@ -13598,15 +13666,7 @@ function renderVocabCards() {
   });
 }
 
-function speakVocabItem(word, lang) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(word);
-    u.lang = lang === 'de' ? 'de-DE' : 'en-US';
-    u.rate = 0.9;
-    window.speechSynthesis.speak(u);
-  }
-}
+
 
 // 标记已掌握 / 移回生词
 function toggleCardLearned(key, isLearned) {

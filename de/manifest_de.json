@@ -1,0 +1,33 @@
+{
+  "name": "400句型背诵手册 · 德语母语专版",
+  "short_name": "400句型德语",
+  "start_url": "./?v=3.0",
+  "display": "standalone",
+  "background_color": "#10261b",
+  "theme_color": "#1b3b2b",
+  "description": "400句型与情境故事背诵手册（德语母语专版），内置全部40课德语本土母语音频与Duden双解离线生词本。",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
