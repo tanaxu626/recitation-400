@@ -7181,7 +7181,7 @@ html, body {
 </div>
 
 
-<script src="handbook_dict.js"></script>
+<script src="handbook_dict.js?v=3.3"></script>
 <script>
 var currentPlayingAudio = null;
 var currentSpeechRate = 1.0;
@@ -7871,6 +7871,26 @@ function onWordClick(spanEl) {
   var gender = entry ? entry.gender : '';
   var pos = entry ? entry.pos : '';
   var ipa = entry ? (entry.ipa_uk || entry.ipa_us || entry.phonetic || '') : '';
+
+  // 1. 若当前变体无音标，自动回退继承 lemma 原形音标
+  if (!ipa && entry && entry.lemma) {
+    var lKey = entry.lemma.toLowerCase();
+    var lEntry = langDict[lKey] || langDict[padLesson + '_' + lKey];
+    if (lEntry) {
+      ipa = lEntry.ipa_uk || lEntry.ipa_us || lEntry.phonetic || '';
+    }
+  }
+
+  // 2. 规范化 POS 词性显示标签
+  if (pos) {
+    var pMap = {
+      'v': 'v. 动词', 'V': 'v. 动词', 'vt': 'v. 及物动词', 'vi': 'v. 不及物动词',
+      'n': 'n. 名词', 'N': 'n. 名词', 'adj': 'adj. 形容词', 'ADJ': 'adj. 形容词',
+      'adv': 'adv. 副词', 'ADV': 'adv. 副词', 'det': 'det. 限定词', 'DET': 'det. 限定词',
+      'phrase': '核心短语搭配', 'abstract:': 'n. 名词'
+    };
+    pos = pMap[pos] || pos;
+  }
   var ee_def = entry ? (entry.ee_def || entry.de_def || '') : '';
   var meaning = entry ? entry.meaning : '点击【➕ 收入生词本】可加入您的专属生词库并在课后集中复习。';
   var example_en = entry ? (entry.example_en || entry.example_de || '') : '';
