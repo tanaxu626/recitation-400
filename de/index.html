@@ -7500,7 +7500,7 @@ function onAudioEnded(audioId) {
 
 
 // ==========================================
-// 🔊 全局多媒体高保真通用音频引擎 (全端 100% 发声)
+// 🔊 全局多媒体高保真通用音频引擎 (三核高可用容灾版)
 // ==========================================
 var globalSpeechAudio = null;
 
@@ -7512,18 +7512,21 @@ function playUniversalSpeech(text, lang, btnEl) {
   var isWord = cleanText.indexOf(' ') === -1 && cleanText.length <= 30;
   var audioLang = (lang || (typeof currentLang !== 'undefined' ? currentLang : 'en')).toLowerCase().indexOf('de') !== -1 ? 'de' : 'en';
 
+  // 1. 停止课文全局音频与上一个 TTS 音频
   if (typeof currentPlayingAudio !== 'undefined' && currentPlayingAudio && !currentPlayingAudio.paused) {
     stopCurrentPlayingAudio();
   }
 
   if (globalSpeechAudio) {
     try {
-      globalSpeechAudio.pause();
-      globalSpeechAudio.src = '';
+      var prevAudio = globalSpeechAudio;
+      globalSpeechAudio = null;
+      prevAudio.pause();
+      prevAudio.src = '';
     } catch(e) {}
-    globalSpeechAudio = null;
   }
 
+  // 2. 按钮加载/播放动效反馈
   var origHtml = btnEl ? btnEl.innerHTML : '';
   if (btnEl) {
     btnEl.classList.add('audio-active-playing');
@@ -7539,36 +7542,72 @@ function playUniversalSpeech(text, lang, btnEl) {
     }
   }
 
-  var audioUrl = '';
-  if (isWord && audioLang === 'en') {
-    audioUrl = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(cleanText) + '&type=2';
-  } else {
-    audioUrl = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(cleanText) + '&tl=' + audioLang + '&client=tw-ob';
-  }
+  // 3. 构建多源容灾音频列表 (按优先级排队，国内秒开，零阻断)
+  var sources = [];
+  var encText = encodeURIComponent(cleanText);
 
-  var audio = new Audio();
-  audio.crossOrigin = 'anonymous';
-  audio.src = audioUrl;
-  globalSpeechAudio = audio;
-
-  var playPromise = audio.play();
-  if (playPromise !== undefined) {
-    playPromise.then(function() {
-      if (btnEl && btnEl.textContent.indexOf('⏳') !== -1) {
-        btnEl.textContent = btnEl.textContent.replace('⏳', '🔊');
+  if (audioLang === 'en') {
+    if (isWord) {
+      // 单词：优先网易有道母带真人美音 -> 百度高保真云TTS -> 谷歌TTS
+      sources.push('https://dict.youdao.com/dictvoice?audio=' + encText + '&type=2');
+      sources.push('https://fanyi.baidu.com/gettts?lan=en&text=' + encText + '&spd=3&source=web');
+      sources.push('https://translate.google.com/translate_tts?ie=UTF-8&q=' + encText + '&tl=en&client=tw-ob');
+    } else {
+      // 例句/句型：优先百度高保真云TTS（国内秒开+无字数限制） -> 谷歌TTS -> 有道短句
+      sources.push('https://fanyi.baidu.com/gettts?lan=en&text=' + encText + '&spd=3&source=web');
+      sources.push('https://translate.google.com/translate_tts?ie=UTF-8&q=' + encText + '&tl=en&client=tw-ob');
+      if (cleanText.length <= 40) {
+        sources.push('https://dict.youdao.com/dictvoice?audio=' + encText + '&type=2');
       }
-    }).catch(function(e) {
-      fallbackSpeechSynthesis(cleanText, audioLang, restoreBtn);
-    });
+    }
+  } else {
+    // 德语：优先谷歌德语标准母带
+    sources.push('https://translate.google.com/translate_tts?ie=UTF-8&q=' + encText + '&tl=de&client=tw-ob');
   }
 
-  audio.onended = function() {
-    restoreBtn();
-    globalSpeechAudio = null;
-  };
-  audio.onerror = function() {
-    fallbackSpeechSynthesis(cleanText, audioLang, restoreBtn);
-  };
+  // 4. 递归容灾播放器
+  var sourceIndex = 0;
+
+  function tryNextSource() {
+    if (sourceIndex >= sources.length) {
+      // 全部在线音频流均不可用时，降级调用系统本地 TTS
+      fallbackSpeechSynthesis(cleanText, audioLang, restoreBtn);
+      return;
+    }
+
+    var currentUrl = sources[sourceIndex++];
+    var audio = new Audio();
+    // ⚠️ 严禁添加 crossOrigin，会导致 Youdao 等无 CORS 头音频被浏览器安全拦截！
+    audio.src = currentUrl;
+    globalSpeechAudio = audio;
+
+    audio.onended = function() {
+      if (audio === globalSpeechAudio) {
+        restoreBtn();
+        globalSpeechAudio = null;
+      }
+    };
+
+    audio.onerror = function() {
+      if (audio !== globalSpeechAudio) return;
+      tryNextSource();
+    };
+
+    var playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(function() {
+        if (audio !== globalSpeechAudio) return;
+        if (btnEl && btnEl.textContent.indexOf('⏳') !== -1) {
+          btnEl.textContent = btnEl.textContent.replace('⏳', '🔊');
+        }
+      }).catch(function(e) {
+        if (audio !== globalSpeechAudio || (e && (e.name === 'AbortError' || e.name === 'NotAllowedError'))) return;
+        tryNextSource();
+      });
+    }
+  }
+
+  tryNextSource();
 }
 
 function fallbackSpeechSynthesis(cleanText, audioLang, onComplete) {
@@ -7605,14 +7644,16 @@ function speakCurrentModalExample(e) {
   if (e && e.stopPropagation) e.stopPropagation();
   if (!currentModalWordData) return;
   var text = currentModalWordData.example_en || currentModalWordData.example_de;
-  var btn = e ? e.currentTarget : null;
+  var btn = e ? (e.currentTarget || e.target) : document.querySelector('.word-dict-example-audio-btn');
   playUniversalSpeech(text, currentModalWordData.lang, btn);
 }
 
-function speakVocabItem(word, lang) {
-  var btn = window.event ? (window.event.currentTarget || window.event.target) : null;
-  playUniversalSpeech(word, lang, btn);
+function speakVocabItem(word, lang, btnEl) {
+  var targetBtn = btnEl || (window.event ? (window.event.currentTarget || window.event.target) : null);
+  playUniversalSpeech(word, lang, targetBtn);
 }
+
+
 
 
 
